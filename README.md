@@ -3,7 +3,7 @@
 First, make sure you have Go properly installed and setup.
 
 ```bash
-git clone https://github.com/gomig/gomig
+git clone https://github.com/gomig/mig
 cd gomig
 go install .
 ```
