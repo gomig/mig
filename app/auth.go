@@ -3,12 +3,11 @@ package app
 import (
 	"encoding/json"
 	"os"
+	"path"
 
 	"github.com/gomig/crypto"
 	"github.com/gomig/utils"
 )
-
-const CRED_FILE = ".mig-creds"
 
 type Credential struct {
 	Key      string `json:"key"`
@@ -19,20 +18,26 @@ type Credential struct {
 type Authentications struct {
 	credentials []Credential
 	crypto      crypto.Crypto
+	file        string
 }
 
 func (a *Authentications) Init() {
 	a.credentials = make([]Credential, 0)
 	a.crypto = crypto.NewCryptography("78e0cc765626542f21b0fcf71465f9cbdffe30c3855ec81692df37368b9901d6")
+	if home, err := os.UserHomeDir(); err != nil {
+		panic(err)
+	} else {
+		a.file = path.Join(home, ".mig")
+	}
 }
 
 func (a *Authentications) Read() error {
 	a.Init()
-	if ok, err := utils.FileExists(CRED_FILE); err != nil {
+	if ok, err := utils.FileExists(a.file); err != nil {
 		return err
 	} else if ok {
 		creds := make([]Credential, 0)
-		raw, err := os.ReadFile(CRED_FILE)
+		raw, err := os.ReadFile(a.file)
 		if err != nil {
 			return err
 		}
@@ -63,7 +68,7 @@ func (a Authentications) Write() error {
 		return err
 	}
 
-	return os.WriteFile(CRED_FILE, []byte(encrypted), 0644)
+	return os.WriteFile(a.file, []byte(encrypted), 0644)
 
 }
 
