@@ -9,8 +9,8 @@ import (
 // VersionCommand get cli version
 var VersionCommand = &cobra.Command{
 	Use:   "version",
-	Short: "get gomig cli version",
+	Short: "get mig cli version",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Version 1.0.0")
+		fmt.Println("Version 2.0.0")
 	},
 }
