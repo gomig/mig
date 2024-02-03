@@ -13,7 +13,7 @@ import (
 // @param data template data
 // @param replacements string based replacement
 func CompileTemplate(name, commentSymbol, content string, data map[string]string, replacements map[string]string) (string, error) {
-	content = resolvePlaceholders(content, commentSymbol, replacements)
+	content = ResolvePlaceholders(content, commentSymbol, replacements)
 	content = normalizeTemplate(content, commentSymbol)
 	tpl, err := template.New(name).Delims(`{{`, `}}`).Parse(content)
 	if err != nil {
@@ -30,7 +30,7 @@ func CompileTemplate(name, commentSymbol, content string, data map[string]string
 	}
 }
 
-func resolvePlaceholders(content, commentSymbol string, replacements map[string]string) string {
+func ResolvePlaceholders(content, commentSymbol string, replacements map[string]string) string {
 	oldNew := make([]string, 0)
 	for search, replace := range replacements {
 		oldNew = append(oldNew, search)

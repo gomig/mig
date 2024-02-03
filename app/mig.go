@@ -68,6 +68,7 @@ func (mig Mig) ShouldIgnore(path string) bool {
 
 // Compile compile file
 func (mig *Mig) Compile(path string, content []byte) error {
+	path = helpers.ResolvePlaceholders(path, "//", mig.Replacements())
 	if v, err := helpers.CompileTemplate(
 		path,
 		"//",

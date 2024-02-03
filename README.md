@@ -100,7 +100,7 @@ To configure your project template you need to put `mig.json` file in the root o
 
   - **name:** Name of rule. You can use rule answer in your template with rule name (`.web`, `.app_name`, ...).
   - **default:** Default rule value if user leave answer empty.
-  - **placeholder:** A placeholder text to replace with rule answer.
+  - **placeholder:** A placeholder text to replace with rule answer. You can use placeholder in file name or string quotes.
   - **desc:** Rule description.
   - **options:** List of valid options for rule. If options not defined any text allowed.
   - **files:** File proccess conditions. You can define which file must included on final result based on rule value.
@@ -125,6 +125,11 @@ To configure your project template you need to put `mig.json` file in the root o
         "n": ["console.md"], // console.md only included if web answer was n
         "y": ["web.md", "web.js", "views", "public", "src/app.js"] // this files and directory not listed if answer was n
       }
+    },
+    {
+      "name": "locale",
+      "default": "en",
+      "placeholder": "__LOCALE__"
     }
   ],
   "scripts": ["npm install", "git init", "git add .", "git commit -m init"]
