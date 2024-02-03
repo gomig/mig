@@ -8,11 +8,11 @@ import (
 )
 
 type MigConfig struct {
-	Name    string   `json:"name"`
-	Intro   string   `json:"intro"`
-	Message string   `json:"message"`
-	Rules   []Rule   `json:"rules"`
-	Scripts []string `json:"scripts"`
+	Name    string     `json:"name"`
+	Intro   string     `json:"intro"`
+	Message string     `json:"message"`
+	Rules   []Rule     `json:"rules"`
+	Scripts [][]string `json:"scripts"`
 }
 
 type Mig struct {
@@ -29,7 +29,7 @@ func (mig *Mig) Init() {
 	mig.ignores = make([]string, 0)
 	mig.config = MigConfig{}
 	mig.config.Rules = make([]Rule, 0)
-	mig.config.Scripts = make([]string, 0)
+	mig.config.Scripts = make([][]string, 0)
 }
 
 // Parse config from json data
@@ -116,7 +116,7 @@ func (mig *Mig) AddRule(q ...Rule) {
 
 // AddScript append post script
 func (mig *Mig) AddScript(s ...string) {
-	mig.config.Scripts = append(mig.config.Scripts, s...)
+	mig.config.Scripts = append(mig.config.Scripts, s)
 }
 
 // AddIgnore append new ignore path
@@ -127,11 +127,10 @@ func (mig *Mig) AddIgnore(path ...string) {
 }
 
 // Scripts get post scripts
-func (mig *Mig) Scripts() []string {
-	res := make([]string, 0)
+func (mig *Mig) Scripts() [][]string {
+	res := make([][]string, 0)
 	for _, script := range mig.config.Scripts {
-		script = strings.TrimSpace(script)
-		if script != "" {
+		if len(script) > 0 {
 			res = append(res, script)
 		}
 	}

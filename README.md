@@ -132,6 +132,11 @@ To configure your project template you need to put `mig.json` file in the root o
       "placeholder": "__LOCALE__"
     }
   ],
-  "scripts": ["npm install", "git init", "git add .", "git commit -m init"]
+  "scripts": [
+    ["npm", "install"],
+    ["git", "init"],
+    ["git", "add", "."],
+    ["git", "commit", "-m", "'initialize app'"]
+  ]
 }
 ```

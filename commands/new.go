@@ -105,10 +105,10 @@ func init() {
 
 		// Run post scripts
 		base := "./" + name
-		for _, script := range cli.Scripts() {
+		for _, parts := range cli.Scripts() {
 			command := ""
 			args := make([]string, 0)
-			if parts := strings.Split(script, " "); len(parts) == 0 {
+			if len(parts) == 0 {
 				continue
 			} else {
 				command = parts[0]
@@ -118,7 +118,7 @@ func init() {
 			}
 			cmd := exec.Command(command, args...)
 			cmd.Dir = base
-			fmt.Printf("Run (%s): ", script)
+			fmt.Printf("Run (%s): ", strings.Join(parts, " "))
 			if err := cmd.Run(); err != nil {
 				fmt.Printf("FAILED!\n")
 				fmt.Println(err)
