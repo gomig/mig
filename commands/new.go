@@ -36,7 +36,7 @@ func init() {
 		auth.Read()
 
 		// get repository
-		cli.AddQuestion(app.Question{
+		cli.AddRule(app.Rule{
 			Name:        "repo",
 			Description: "Enter your github repository",
 			Default:     "gomig/boilerplate",
@@ -71,7 +71,9 @@ func init() {
 		// Parse app configuration
 		cli.Init()
 		if config, err := util.ReadFile(source, "/mig.json"); err == nil {
-			helpers.Handle(cli.Parse(config))
+			if err := cli.Parse(config); err != nil {
+				fmt.Println("Can't parse config file!")
+			}
 		} else if err != fs.ErrNotExist {
 			helpers.Handle(err)
 		}
@@ -126,5 +128,8 @@ func init() {
 		}
 
 		fmt.Println("App Created")
+		if message := cli.Message(); message != "" {
+			fmt.Println(message)
+		}
 	}
 }

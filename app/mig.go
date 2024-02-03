@@ -8,12 +8,11 @@ import (
 )
 
 type MigConfig struct {
-	Name      string     `json:"name"`
-	Intro     string     `json:"intro"`
-	Message   string     `json:"message"`
-	Comment   string     `json:"comment"`
-	Scripts   []string   `json:"scripts"`
-	Questions []Question `json:"conditions"`
+	Name    string   `json:"name"`
+	Intro   string   `json:"intro"`
+	Message string   `json:"message"`
+	Rules   []Rule   `json:"rules"`
+	Scripts []string `json:"scripts"`
 }
 
 type Mig struct {
@@ -29,8 +28,8 @@ func (mig *Mig) Init() {
 	mig.compiled = make(map[string]string)
 	mig.ignores = make([]string, 0)
 	mig.config = MigConfig{}
+	mig.config.Rules = make([]Rule, 0)
 	mig.config.Scripts = make([]string, 0)
-	mig.config.Questions = make([]Question, 0)
 }
 
 // Parse config from json data
@@ -43,6 +42,47 @@ func (mig *Mig) Parse(data []byte) error {
 	mig.config = *config
 	return nil
 }
+
+// Start question wizard
+func (mig *Mig) Start() {
+	mig.answers = make(map[string]string)
+	for _, q := range mig.config.Rules {
+		answer := q.Ask()
+		for _, ignore := range q.Ignores(answer) {
+			mig.ignores = append(mig.ignores, helpers.NormalizePath(ignore))
+		}
+		mig.answers[q.Name] = answer
+	}
+}
+
+// ShouldIgnore check if path should ignore
+func (mig Mig) ShouldIgnore(path string) bool {
+	path = helpers.NormalizePath(path)
+	for _, ignore := range mig.ignores {
+		if path == ignore || helpers.IsPathOf(path, ignore) {
+			return true
+		}
+	}
+	return false
+}
+
+// Compile compile file
+func (mig *Mig) Compile(path string, content []byte) error {
+	if v, err := helpers.CompileTemplate(
+		path,
+		"//",
+		string(content),
+		mig.answers,
+		mig.Replacements(),
+	); err != nil {
+		return err
+	} else {
+		mig.compiled[path] = v
+	}
+	return nil
+}
+
+// Getter and setters
 
 // Name get or set app name
 func (mig *Mig) Name(v ...string) string {
@@ -68,15 +108,9 @@ func (mig *Mig) Message(v ...string) string {
 	return strings.TrimSpace(mig.config.Message)
 }
 
-// Comment get or set app comment symbol
-func (mig *Mig) Comment(v ...string) string {
-	if len(v) > 0 {
-		mig.config.Comment = v[0]
-	}
-	if strings.TrimSpace(mig.config.Comment) == "" {
-		mig.config.Comment = `//`
-	}
-	return strings.TrimSpace(mig.config.Comment)
+// AddRule append rule
+func (mig *Mig) AddRule(q ...Rule) {
+	mig.config.Rules = append(mig.config.Rules, q...)
 }
 
 // AddScript append post script
@@ -84,66 +118,11 @@ func (mig *Mig) AddScript(s ...string) {
 	mig.config.Scripts = append(mig.config.Scripts, s...)
 }
 
-// AddQuestion append question
-func (mig *Mig) AddQuestion(q ...Question) {
-	mig.config.Questions = append(mig.config.Questions, q...)
-}
-
 // AddIgnore append new ignore path
 func (mig *Mig) AddIgnore(path ...string) {
 	for _, p := range path {
 		mig.ignores = append(mig.ignores, helpers.NormalizePath(p))
 	}
-}
-
-// Find find question
-func (mig Mig) Find(name string) *Question {
-	for _, rule := range mig.config.Questions {
-		if rule.Name == name {
-			return &rule
-		}
-	}
-	return nil
-}
-
-// Start question wizard
-func (mig *Mig) Start() {
-	mig.answers = make(map[string]string)
-	for _, q := range mig.config.Questions {
-		answer := q.Ask()
-		if answer == q.Falsy {
-			for _, i := range q.Files {
-				mig.ignores = append(mig.ignores, helpers.NormalizePath(i))
-			}
-		}
-		mig.answers[q.Name] = answer
-	}
-}
-
-// ShouldIgnore check if path should ignore
-func (mig Mig) ShouldIgnore(path string) bool {
-	path = helpers.NormalizePath(path)
-	for _, ignore := range mig.ignores {
-		if path == ignore || helpers.IsPathOf(path, ignore) {
-			return true
-		}
-	}
-	return false
-}
-
-// Result get wizard result
-func (mig Mig) Result(name string) string {
-	return mig.answers[name]
-}
-
-// Answers get wizard results
-func (mig Mig) Answers() map[string]string {
-	return mig.answers
-}
-
-// Compiled get compiled results
-func (mig Mig) Compiled() map[string]string {
-	return mig.compiled
 }
 
 // Scripts get post scripts
@@ -161,7 +140,7 @@ func (mig *Mig) Scripts() []string {
 // Replacements get replacements data
 func (mig *Mig) Replacements() map[string]string {
 	res := make(map[string]string)
-	for _, q := range mig.config.Questions {
+	for _, q := range mig.config.Rules {
 		if q.Placeholder != "" {
 			res[q.Placeholder] = mig.Result(q.Name)
 		}
@@ -169,18 +148,17 @@ func (mig *Mig) Replacements() map[string]string {
 	return res
 }
 
-// Compile compile file
-func (mig *Mig) Compile(path string, content []byte) error {
-	if v, err := helpers.CompileTemplate(
-		path,
-		mig.Comment(),
-		string(content),
-		mig.answers,
-		mig.Replacements(),
-	); err != nil {
-		return err
-	} else {
-		mig.compiled[path] = v
-	}
-	return nil
+// Result get wizard result
+func (mig Mig) Result(name string) string {
+	return mig.answers[name]
+}
+
+// Answers get wizard results
+func (mig Mig) Answers() map[string]string {
+	return mig.answers
+}
+
+// Compiled get compiled results
+func (mig Mig) Compiled() map[string]string {
+	return mig.compiled
 }
