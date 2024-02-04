@@ -26,10 +26,10 @@ func NormalizeRepo(r string) string {
 
 // NormalizePath set path separator to /
 func NormalizePath(path string) string {
-	return "/" + strings.TrimLeft(strings.NewReplacer(`\`, `/`).Replace(path), "/")
+	return "/" + strings.TrimRight(strings.TrimLeft(strings.NewReplacer(`\`, `/`).Replace(path), "/"), "/")
 }
 
 // IsPathOf check if is subdirectory of path
 func IsPathOf(path, dir string) bool {
-	return strings.HasPrefix(path, NormalizePath(dir)+"/")
+	return path == dir || strings.HasPrefix(path, NormalizePath(dir)+"/")
 }

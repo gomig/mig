@@ -116,6 +116,9 @@ To configure your project template you need to put `mig.json` file in the root o
   - **options:** List of valid options for rule. If options not defined any text allowed.
   - **files:** File proccess conditions. You can define which file must included on final result based on rule value.
 
+- **scripts:** List of scripts to run after project create. Script must splited to array of args.
+- **statics:** List of static assets to not compile with template engine.
+
 ```json
 {
   "name": "My Template",
@@ -148,6 +151,7 @@ To configure your project template you need to put `mig.json` file in the root o
     ["git", "init"],
     ["git", "add", "."],
     ["git", "commit", "-m", "'initialize app'"]
-  ]
+  ],
+  "statics": ["public/favicon.ico", "assets/icons"]
 }
 ```

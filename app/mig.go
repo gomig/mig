@@ -13,6 +13,7 @@ type MigConfig struct {
 	Message string     `json:"message"`
 	Rules   []Rule     `json:"rules"`
 	Scripts [][]string `json:"scripts"`
+	Statics []string   `json:"statics"`
 }
 
 type Mig struct {
@@ -48,9 +49,7 @@ func (mig *Mig) Start() {
 	mig.answers = make(map[string]string)
 	for _, q := range mig.config.Rules {
 		answer := q.Ask()
-		for _, ignore := range q.Ignores(answer) {
-			mig.ignores = append(mig.ignores, helpers.NormalizePath(ignore))
-		}
+		mig.ignores = append(mig.ignores, q.Ignores(answer)...)
 		mig.answers[q.Name] = answer
 	}
 }
@@ -59,7 +58,18 @@ func (mig *Mig) Start() {
 func (mig Mig) ShouldIgnore(path string) bool {
 	path = helpers.NormalizePath(path)
 	for _, ignore := range mig.ignores {
-		if path == ignore || helpers.IsPathOf(path, ignore) {
+		if helpers.IsPathOf(path, ignore) {
+			return true
+		}
+	}
+	return false
+}
+
+// ShouldCompile check if path should compile
+func (mig Mig) ShouldCompile(path string) bool {
+	path = helpers.NormalizePath(path)
+	for _, static := range mig.config.Statics {
+		if helpers.IsPathOf(path, static) {
 			return true
 		}
 	}
@@ -68,17 +78,21 @@ func (mig Mig) ShouldIgnore(path string) bool {
 
 // Compile compile file
 func (mig *Mig) Compile(path string, content []byte) error {
-	path = helpers.ResolvePlaceholders(path, "//", mig.Replacements())
-	if v, err := helpers.CompileTemplate(
-		path,
-		"//",
-		string(content),
-		mig.answers,
-		mig.Replacements(),
-	); err != nil {
-		return err
+	realPath := helpers.ResolvePlaceholders(path, "//", mig.Replacements())
+	if mig.ShouldCompile(path) {
+		if v, err := helpers.CompileTemplate(
+			path,
+			"//",
+			string(content),
+			mig.answers,
+			mig.Replacements(),
+		); err != nil {
+			return err
+		} else {
+			mig.compiled[realPath] = v
+		}
 	} else {
-		mig.compiled[path] = v
+		mig.compiled[realPath] = string(content)
 	}
 	return nil
 }
@@ -119,11 +133,14 @@ func (mig *Mig) AddScript(s ...string) {
 	mig.config.Scripts = append(mig.config.Scripts, s)
 }
 
+// AddStatic append static path
+func (mig *Mig) AddStatic(path ...string) {
+	mig.config.Statics = append(mig.config.Statics, path...)
+}
+
 // AddIgnore append new ignore path
 func (mig *Mig) AddIgnore(path ...string) {
-	for _, p := range path {
-		mig.ignores = append(mig.ignores, helpers.NormalizePath(p))
-	}
+	mig.ignores = append(mig.ignores, path...)
 }
 
 // AddAnswer append new answer path
