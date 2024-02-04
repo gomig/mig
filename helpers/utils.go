@@ -31,5 +31,7 @@ func NormalizePath(path string) string {
 
 // IsPathOf check if is subdirectory of path
 func IsPathOf(path, dir string) bool {
-	return path == dir || strings.HasPrefix(path, NormalizePath(dir)+"/")
+	path = NormalizePath(path)
+	dir = NormalizePath(dir)
+	return path == dir || strings.HasPrefix(path, dir+"/")
 }

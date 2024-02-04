@@ -57,7 +57,6 @@ func (mig *Mig) Start() {
 
 // ShouldIgnore check if path should ignore
 func (mig Mig) ShouldIgnore(path string) bool {
-	path = helpers.NormalizePath(path)
 	for _, ignore := range mig.config.Ignores {
 		if helpers.IsPathOf(path, ignore) {
 			return true
@@ -68,17 +67,17 @@ func (mig Mig) ShouldIgnore(path string) bool {
 
 // ShouldCompile check if path should compile
 func (mig Mig) ShouldCompile(path string) bool {
-	path = helpers.NormalizePath(path)
 	for _, static := range mig.config.Statics {
 		if helpers.IsPathOf(path, static) {
-			return true
+			return false
 		}
 	}
-	return false
+	return true
 }
 
 // Compile compile file
 func (mig *Mig) Compile(path string, content []byte) error {
+	path = helpers.NormalizePath(path)
 	realPath := helpers.ResolvePlaceholders(path, "//", mig.Replacements())
 	if mig.ShouldCompile(path) {
 		if v, err := helpers.CompileTemplate(

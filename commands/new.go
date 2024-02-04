@@ -139,7 +139,7 @@ func init() {
 				if content, err := util.ReadFile(source, path); err != nil {
 					return err
 				} else {
-					if err := cli.Compile(helpers.NormalizePath(path), content); err != nil {
+					if err := cli.Compile(path, content); err != nil {
 						return err
 					}
 				}
