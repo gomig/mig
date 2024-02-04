@@ -70,6 +70,8 @@ mig users
 
 Mig compile repository template base on [Go Text Template Library](https://pkg.go.dev/text/template). Each repository must contain `mig.json` configuration file in th root of repository.
 
+**NOTE:** By default template contains `name` variable with `__name__` placeholder. You can use this variable to access app name entered by user.
+
 ### Extra Template Signs
 
 Sometimes you want to comment code in template by default and compiled to code under some conditions.

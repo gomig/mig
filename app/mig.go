@@ -126,6 +126,11 @@ func (mig *Mig) AddIgnore(path ...string) {
 	}
 }
 
+// AddAnswer append new answer path
+func (mig *Mig) AddAnswer(name, v string) {
+	mig.answers[name] = v
+}
+
 // Scripts get post scripts
 func (mig *Mig) Scripts() [][]string {
 	res := make([][]string, 0)

@@ -85,6 +85,13 @@ func init() {
 			fmt.Println(intro)
 		}
 		cli.Start()
+		cli.AddRule(app.Rule{
+			Name:        "name",
+			Default:     name,
+			Placeholder: "__name__",
+			Description: "Application name",
+		})
+		cli.AddAnswer("name", name)
 
 		// Proccess files
 		util.Walk(source, source.Root(), func(path string, info fs.FileInfo, err error) error {
