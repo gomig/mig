@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 
+	"github.com/gomig/mig/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -13,12 +14,11 @@ var UpdateCommand = &cobra.Command{
 	Short: "update cli to last version",
 	Run: func(c *cobra.Command, args []string) {
 		cmd := exec.Command("go", "install", "github.com/gomig/mig")
-		fmt.Printf("Install github.com/gomig/mig: ")
+		fmt.Println("Install github.com/gomig/mig")
 		if err := cmd.Run(); err != nil {
-			fmt.Printf("FAILED!\n")
-			fmt.Println(err)
+			fmt.Println(helpers.ErrorF(err.Error()))
 		} else {
-			fmt.Printf("OK\n")
+			fmt.Println(helpers.SuccessF("DONE"))
 		}
 	},
 }

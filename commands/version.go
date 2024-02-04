@@ -3,6 +3,7 @@ package commands
 import (
 	"fmt"
 
+	"github.com/gomig/mig/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -11,6 +12,6 @@ var VersionCommand = &cobra.Command{
 	Use:   "version",
 	Short: "get mig cli version",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Version 2.0.0")
+		fmt.Printf("Version %s\n", helpers.SuccessF("2.0.1"))
 	},
 }

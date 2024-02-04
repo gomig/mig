@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gomig/mig/app"
+	"github.com/gomig/mig/helpers"
 	"github.com/spf13/cobra"
 )
 
@@ -16,16 +17,16 @@ var UnAuthCommand = &cobra.Command{
 		auth := new(app.Authentications)
 		auth.Init()
 		if err := auth.Read(); err != nil {
-			fmt.Println(err)
+			fmt.Println(helpers.ErrorF(err.Error()))
 			return
 		}
 
 		auth.Delete(args[0])
 		if err := auth.Write(); err != nil {
-			fmt.Println(err)
+			fmt.Println(helpers.ErrorF(err.Error()))
 			return
 		}
 
-		fmt.Println("Auth Deleted")
+		fmt.Println(helpers.SuccessF("Auth Deleted"))
 	},
 }

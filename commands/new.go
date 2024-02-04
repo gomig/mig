@@ -35,10 +35,16 @@ func init() {
 		auth.Init()
 		auth.Read()
 
+		// Validate params
+		if cred := auth.Find(cmd.Flag("auth").Value.String()); cred == nil && cmd.Flag("auth").Value.String() != "" {
+			fmt.Println(helpers.ErrorF("auth not registered!"))
+			return
+		}
+
 		// get repository
 		cli.AddRule(app.Rule{
 			Name:        "repo",
-			Description: "Enter your github repository",
+			Description: "Enter template repository",
 			Default:     "gomig/boilerplate",
 		})
 		cli.Start()
@@ -48,38 +54,38 @@ func init() {
 		name := strings.TrimSpace(args[0])
 		branch := cmd.Flag("branch").Value.String()
 		var cred *http.BasicAuth
-		if key := cmd.Flag("auth").Value.String(); key != "" {
-			if c := auth.Find(key); c == nil {
-				fmt.Printf("Failed: %s auth not registered!\n", key)
-				return
-			} else {
-				cred = &http.BasicAuth{Username: c.Username, Password: c.Token}
-			}
+		if c := auth.Find(cmd.Flag("auth").Value.String()); c != nil {
+			cred = &http.BasicAuth{Username: c.Username, Password: c.Token}
 		}
 
 		// Fetch repository
-		fmt.Println("Fetching Repository...")
+		fmt.Println(helpers.Format("Fetching Repository...", helpers.ITALIC, helpers.BLUE))
 		source := memfs.New()
-		helpers.HandleV(git.Clone(memory.NewStorage(), source, &git.CloneOptions{
+		if _, err := git.Clone(memory.NewStorage(), source, &git.CloneOptions{
 			Auth:          cred,
 			URL:           repo,
 			SingleBranch:  true,
 			ReferenceName: plumbing.ReferenceName(branch),
-		}))
+		}); err != nil {
+			fmt.Println(helpers.ErrorF(err.Error()))
+			return
+		}
 		fmt.Println("")
 
 		// Parse app configuration
 		cli.Init()
 		if config, err := util.ReadFile(source, "/mig.json"); err == nil {
 			if err := cli.Parse(config); err != nil {
-				fmt.Println("Can't parse config file!")
+				fmt.Println(helpers.ErrorF("Can't parse config file!"))
+				return
 			}
 		} else if err != fs.ErrNotExist {
-			helpers.Handle(err)
+			fmt.Println(helpers.ErrorF(err.Error()))
+			return
 		}
 		cli.AddIgnore("mig.json")
 		if name := cli.Name(); name != "" {
-			fmt.Println(name)
+			fmt.Println(helpers.Format(name, helpers.BOLD, helpers.BLUE))
 		}
 		if intro := cli.Intro(); intro != "" {
 			fmt.Println(intro)
@@ -94,20 +100,36 @@ func init() {
 		cli.AddAnswer("name", name)
 
 		// Proccess files
-		util.Walk(source, source.Root(), func(path string, info fs.FileInfo, err error) error {
-			if !info.IsDir() && !cli.ShouldIgnore(path) {
-				content := helpers.HandleV(util.ReadFile(source, path))
-				helpers.Handle(cli.Compile(helpers.NormalizePath(path), content))
+		if err := util.Walk(source, source.Root(), func(path string, info fs.FileInfo, err error) error {
+			if !info.IsDir() && !cli.ShouldIgnore(path) && err == nil {
+				if content, err := util.ReadFile(source, path); err != nil {
+					return err
+				} else {
+					if err := cli.Compile(helpers.NormalizePath(path), content); err != nil {
+						return err
+					}
+				}
 			}
 			return nil
-		})
+		}); err != nil {
+			fmt.Println(helpers.ErrorF(err.Error()))
+			return
+		}
 
 		// Create out filesystem
 		distFS := osfs.New(name, osfs.WithBoundOS())
 		for file, content := range cli.Compiled() {
-			f := helpers.HandleV(distFS.Create(file))
-			helpers.HandleV(f.Write([]byte(content)))
-			f.Close()
+			if f, err := distFS.Create(file); err != nil {
+				fmt.Println(helpers.ErrorF(err.Error()))
+				return
+			} else {
+				if _, err := f.Write([]byte(content)); err != nil {
+					f.Close()
+					fmt.Println(helpers.ErrorF(err.Error()))
+					return
+				}
+				f.Close()
+			}
 		}
 
 		// Run post scripts
@@ -125,16 +147,16 @@ func init() {
 			}
 			cmd := exec.Command(command, args...)
 			cmd.Dir = base
-			fmt.Printf("Run (%s): ", strings.Join(parts, " "))
+			fmt.Printf("Run (%s)\n", helpers.Format(strings.Join(parts, " "), helpers.ITALIC, helpers.BLUE))
 			if err := cmd.Run(); err != nil {
-				fmt.Printf("FAILED!\n")
-				fmt.Println(err)
+				fmt.Println(helpers.ErrorF(err.Error()))
 			} else {
-				fmt.Printf("OK\n")
+				fmt.Println(helpers.SuccessF("DONE"))
 			}
 		}
 
-		fmt.Println("App Created")
+		fmt.Println("")
+		fmt.Println(helpers.Format("Project Created", helpers.BOLD, helpers.GREEN))
 		if message := cli.Message(); message != "" {
 			fmt.Println(message)
 		}

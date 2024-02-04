@@ -2,7 +2,6 @@ package app
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/gomig/mig/helpers"
 	"github.com/gomig/utils"
@@ -34,11 +33,24 @@ func (r Rule) IsValid(answer string) bool {
 // Ask question from input
 func (r Rule) Ask() string {
 	for {
-		if len(r.Options) == 0 {
-			fmt.Printf("%s [default: %s]: ", r.Description, r.Default)
-		} else {
-			fmt.Printf("%s (%s) [default: %s]: ", r.Description, strings.Join(r.Options, "/"), r.Default)
+		opts := ""
+		def := ""
+		if len(r.Options) > 0 {
+			opts = opts + helpers.Format(" (", helpers.GRAY)
+			for i, opt := range r.Options {
+				opts = opts + helpers.Format(opt, helpers.ITALIC, helpers.BLUE)
+				if i+1 < len(r.Options) {
+					opts = opts + helpers.Format("/", helpers.GRAY)
+				}
+			}
+			opts = opts + helpers.Format(")", helpers.GRAY)
 		}
+		if r.Default != "" {
+			def = helpers.Format(" [", helpers.GRAY) +
+				helpers.Format(r.Default, helpers.BOLD, helpers.GREEN) +
+				helpers.Format("]", helpers.GRAY)
+		}
+		fmt.Printf("%s%s%s: ", utils.If(r.Description != "", r.Description, r.Name), opts, def)
 		if answer := helpers.ReadLine(r.Default); r.IsValid(answer) {
 			return answer
 		}
