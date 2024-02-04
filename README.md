@@ -61,9 +61,12 @@ mig unauth main
 ```bash
 mig users
 
-# Key                           User
-# +----------------------------+----
-# main                          johndoe
+# Output
+┌───┬──────────────────┬──────────┐
+│ # │ AUTHENTICATE KEY │ USERNAME │
+├───┼──────────────────┼──────────┤
+│ 1 │ main             │ johndoe  │
+└───┴──────────────────┴──────────┘
 ```
 
 ## Template Repository Guide
