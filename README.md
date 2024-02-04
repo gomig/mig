@@ -96,7 +96,7 @@ var app = new App("__APP__");
 
 ### Configuration
 
-To configure your project template you need to put `mig.json` file in the root of your project. All configuration file `rules` value accessable in template compile.
+To configure your project template you need to put `mig.json` file in the root of your project. All configuration file `rules` value accessable in template syntax with rule name.
 
 - **name:** Template name.
 - **intro:** Introduction text to show before start configuration.
