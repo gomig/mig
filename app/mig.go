@@ -12,14 +12,14 @@ type MigConfig struct {
 	Intro   string     `json:"intro"`
 	Message string     `json:"message"`
 	Rules   []Rule     `json:"rules"`
-	Scripts [][]string `json:"scripts"`
 	Statics []string   `json:"statics"`
+	Ignores []string   `json:"ignores"`
+	Scripts [][]string `json:"scripts"`
 }
 
 type Mig struct {
 	answers  map[string]string
 	compiled map[string]string
-	ignores  []string
 	config   MigConfig
 }
 
@@ -27,9 +27,10 @@ type Mig struct {
 func (mig *Mig) Init() {
 	mig.answers = make(map[string]string)
 	mig.compiled = make(map[string]string)
-	mig.ignores = make([]string, 0)
 	mig.config = MigConfig{}
 	mig.config.Rules = make([]Rule, 0)
+	mig.config.Statics = make([]string, 0)
+	mig.config.Ignores = make([]string, 0)
 	mig.config.Scripts = make([][]string, 0)
 }
 
@@ -49,7 +50,7 @@ func (mig *Mig) Start() {
 	mig.answers = make(map[string]string)
 	for _, q := range mig.config.Rules {
 		answer := q.Ask()
-		mig.ignores = append(mig.ignores, q.Ignores(answer)...)
+		mig.config.Ignores = append(mig.config.Ignores, q.Ignores(answer)...)
 		mig.answers[q.Name] = answer
 	}
 }
@@ -57,7 +58,7 @@ func (mig *Mig) Start() {
 // ShouldIgnore check if path should ignore
 func (mig Mig) ShouldIgnore(path string) bool {
 	path = helpers.NormalizePath(path)
-	for _, ignore := range mig.ignores {
+	for _, ignore := range mig.config.Ignores {
 		if helpers.IsPathOf(path, ignore) {
 			return true
 		}
@@ -140,7 +141,7 @@ func (mig *Mig) AddStatic(path ...string) {
 
 // AddIgnore append new ignore path
 func (mig *Mig) AddIgnore(path ...string) {
-	mig.ignores = append(mig.ignores, path...)
+	mig.config.Ignores = append(mig.config.Ignores, path...)
 }
 
 // AddAnswer append new answer path
