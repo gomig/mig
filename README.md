@@ -73,7 +73,13 @@ mig users
 
 Mig compile repository template base on [Go Text Template Library](https://pkg.go.dev/text/template). Each repository must contain `mig.json` configuration file in th root of repository.
 
-**NOTE:** By default template contains `name` variable with `__name__` placeholder. You can use this variable to access app name entered by user.
+**NOTE:** You can use user entered app name with `.name` variable or `__name__` placeholder in your template syntax.
+
+**NOTE:** You can use a unique project key with `.key` variable or `__key__` placeholder. Each time you create new project mig generate new key for your project.
+
+**NOTE:** You can use a unique project access token with `.token` variable or `__token__` placeholder. Each time you create new project mig generate new access token for your project.
+
+**NOTE:** You can use a unique project identifier (uuid) with `.uuid` variable or `__uuid__` placeholder. Each time you create new project mig generate new uuid for your project.
 
 ### Extra Template Signs
 

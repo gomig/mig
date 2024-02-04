@@ -8,6 +8,7 @@ require (
 	github.com/gomig/cli v1.0.0
 	github.com/gomig/crypto v1.0.0
 	github.com/gomig/utils v1.0.1
+	github.com/google/uuid v1.6.0
 	github.com/jedib0t/go-pretty/v6 v6.5.4
 	github.com/spf13/cobra v1.8.0
 	golang.org/x/sys v0.16.0

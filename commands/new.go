@@ -13,8 +13,10 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/storage/memory"
+	"github.com/gomig/crypto"
 	"github.com/gomig/mig/app"
 	"github.com/gomig/mig/helpers"
+	"github.com/google/uuid"
 	"github.com/spf13/cobra"
 )
 
@@ -91,13 +93,45 @@ func init() {
 			fmt.Println(intro)
 		}
 		cli.Start()
+
+		// Add global values
 		cli.AddRule(app.Rule{
 			Name:        "name",
 			Default:     name,
 			Placeholder: "__name__",
 			Description: "Application name",
 		})
+		cli.AddRule(app.Rule{
+			Name:        "key",
+			Placeholder: "__key__",
+			Description: "Application key",
+		})
+		cli.AddRule(app.Rule{
+			Name:        "token",
+			Placeholder: "__token__",
+			Description: "Application access token",
+		})
+		cli.AddRule(app.Rule{
+			Name:        "uuid",
+			Placeholder: "__uuid__",
+			Description: "uuid",
+		})
+
+		// Generate keys and fill global variable
 		cli.AddAnswer("name", name)
+		if key, err := crypto.NewCryptography(uuid.New().String()).Hash(uuid.New().String(), crypto.SHA3256); err != nil {
+			fmt.Println(helpers.ErrorF(err.Error()))
+			return
+		} else {
+			cli.AddAnswer("key", key)
+		}
+		if key, err := crypto.NewCryptography(uuid.New().String()).Hash(uuid.New().String(), crypto.SHA3256); err != nil {
+			fmt.Println(helpers.ErrorF(err.Error()))
+			return
+		} else {
+			cli.AddAnswer("token", key)
+		}
+		cli.AddAnswer("uuid", uuid.New().String())
 
 		// Proccess files
 		if err := util.Walk(source, source.Root(), func(path string, info fs.FileInfo, err error) error {
