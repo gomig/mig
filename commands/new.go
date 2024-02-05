@@ -66,7 +66,6 @@ func init() {
 		if _, err := git.Clone(memory.NewStorage(), source, &git.CloneOptions{
 			Auth:          cred,
 			URL:           repo,
-			SingleBranch:  true,
 			ReferenceName: plumbing.ReferenceName(branch),
 		}); err != nil {
 			fmt.Println(helpers.ErrorF(err.Error()))

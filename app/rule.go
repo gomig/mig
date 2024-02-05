@@ -19,12 +19,12 @@ type Rule struct {
 // IsValid check if answer is valid
 func (r Rule) IsValid(answer string) bool {
 	if len(r.Options) == 0 {
-		return true
-	}
-
-	for _, v := range r.Options {
-		if answer == v {
-			return true
+		return answer != ""
+	} else {
+		for _, v := range r.Options {
+			if answer == v {
+				return true
+			}
 		}
 	}
 	return false
@@ -54,7 +54,11 @@ func (r Rule) Ask() string {
 		if answer := helpers.ReadLine(r.Default); r.IsValid(answer) {
 			return answer
 		}
-		fmt.Println("invalid answer!")
+		if len(r.Options) == 0 {
+			fmt.Println(helpers.Format("Enter value", helpers.RED))
+		} else {
+			fmt.Println(helpers.Format("Invalid value", helpers.RED))
+		}
 	}
 }
 

@@ -12,6 +12,6 @@ var VersionCommand = &cobra.Command{
 	Use:   "version",
 	Short: "get mig cli version",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Printf("Version %s\n", helpers.SuccessF("2.0.4"))
+		fmt.Printf("Version %s\n", helpers.SuccessF("2.0.5"))
 	},
 }
