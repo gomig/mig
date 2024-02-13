@@ -62,9 +62,9 @@ func init() {
 // @param content file content
 // @param data template data
 // @param replacements string based replacement
-func CompileTemplate(name, commentSymbol, content string, data map[string]string, replacements map[string]string) (string, error) {
-	content = ResolvePlaceholders(content, commentSymbol, replacements)
-	content = normalizeTemplate(content, commentSymbol)
+func CompileTemplate(name, content string, data map[string]string, replacements map[string]string) (string, error) {
+	content = ResolvePlaceholders(content, replacements)
+	content = normalizeTemplate(content)
 	tpl, err := template.
 		New(name).
 		Delims(`<%`, `%>`).
@@ -84,16 +84,16 @@ func CompileTemplate(name, commentSymbol, content string, data map[string]string
 	}
 }
 
-func ResolvePlaceholders(content, commentSymbol string, replacements map[string]string) string {
+func ResolvePlaceholders(content string, replacements map[string]string) string {
 	oldNew := make([]string, 0)
 	for search, replace := range replacements {
 		oldNew = append(oldNew, search)
 		oldNew = append(oldNew, replace)
 	}
-	oldNew = append(oldNew, commentSymbol+`- `, "", commentSymbol+`-`, "")
+	oldNew = append(oldNew, `//- `, "", `//-`, "")
 	return strings.NewReplacer(oldNew...).Replace(content)
 }
 
-func normalizeTemplate(content, commentSymbol string) string {
-	return strings.NewReplacer(commentSymbol+` {{`, `{{`, commentSymbol+`{{`, `{{`).Replace(content)
+func normalizeTemplate(content string) string {
+	return strings.NewReplacer(`// <%`, "<%", `//<%`, "<%", `"-<%`, "<%", `%>-"`, "%>").Replace(content)
 }

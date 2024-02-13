@@ -135,6 +135,8 @@ Sometimes you want to comment code in template by default and compiled to code u
 
 - **`// <%`** This line translated to `<%` on compile time. You could use template sign with comment.
 - **`//-`** This comment sign remove from start of line on compile time.
+- **`"-<%`** Unquote value of expression on compile time.
+- **`%>-"`** Unquote value of expression on compile time.
 
 ```js
 // Create new instance of <% .appName %>

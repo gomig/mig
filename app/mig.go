@@ -82,7 +82,6 @@ func (mig *Mig) Compile(path string, content []byte) error {
 	if mig.ShouldCompile(path) {
 		if v, err := helpers.CompileTemplate(
 			path,
-			"//",
 			string(content),
 			mig.answers,
 			mig.Replacements(),
