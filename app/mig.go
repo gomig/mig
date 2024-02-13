@@ -78,7 +78,7 @@ func (mig Mig) ShouldCompile(path string) bool {
 // Compile compile file
 func (mig *Mig) Compile(path string, content []byte) error {
 	path = helpers.NormalizePath(path)
-	realPath := helpers.ResolvePlaceholders(path, "//", mig.Replacements())
+	realPath := helpers.ResolvePlaceholders(path, mig.Replacements())
 	if mig.ShouldCompile(path) {
 		if v, err := helpers.CompileTemplate(
 			path,
