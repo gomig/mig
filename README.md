@@ -71,7 +71,7 @@ mig users
 
 ## Template Repository Guide
 
-Mig compile repository template base on [Go Text Template Library](https://pkg.go.dev/text/template). Each repository must contain `mig.json` configuration file in th root of repository.
+Mig compile repository template base on [Go Text Template Library](https://pkg.go.dev/text/template) with `<% %>` delimeter. Each repository must contain `mig.json` configuration file in th root of repository.
 
 **NOTE:** You can use user entered app name with `.name` variable or `__name__` placeholder in your template syntax.
 
@@ -85,19 +85,19 @@ Mig compile repository template base on [Go Text Template Library](https://pkg.g
 
 Sometimes you want to comment code in template by default and compiled to code under some conditions.
 
-- **`// {{`** This line translated to `{{` on compile time. You could use template sign with comment.
+- **`// <%`** This line translated to `<%` on compile time. You could use template sign with comment.
 - **`//-`** This comment sign remove from start of line on compile time.
 
 ```js
-// Create new instance of {{ .appName }}
+// Create new instance of <% .appName %>
 var app = new App("__APP__");
 
 // This code only uncommented if web parameters equal y
-// {{ if eq .web "y" }}
+// <% if eq .web "y" %>
 //- var client = new HttpClient();
 //- client.initialize();
 //- app.Client = client;
-// {{ end }}
+// <% end %>
 ```
 
 ### Configuration

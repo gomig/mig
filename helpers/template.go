@@ -15,7 +15,7 @@ import (
 func CompileTemplate(name, commentSymbol, content string, data map[string]string, replacements map[string]string) (string, error) {
 	content = ResolvePlaceholders(content, commentSymbol, replacements)
 	content = normalizeTemplate(content, commentSymbol)
-	tpl, err := template.New(name).Delims(`{{`, `}}`).Parse(content)
+	tpl, err := template.New(name).Delims(`<%`, `%>`).Parse(content)
 	if err != nil {
 		return "", err
 	}
