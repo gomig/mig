@@ -105,16 +105,6 @@ func init() {
 			Placeholder: "__key__",
 			Description: "Application key",
 		})
-		cli.AddRule(app.Rule{
-			Name:        "token",
-			Placeholder: "__token__",
-			Description: "Application access token",
-		})
-		cli.AddRule(app.Rule{
-			Name:        "uuid",
-			Placeholder: "__uuid__",
-			Description: "uuid",
-		})
 
 		// Generate keys and fill global variable
 		cli.AddAnswer("name", name)
@@ -124,13 +114,6 @@ func init() {
 		} else {
 			cli.AddAnswer("key", key)
 		}
-		if key, err := crypto.NewCryptography(uuid.New().String()).Hash(uuid.New().String(), crypto.SHA3256); err != nil {
-			fmt.Println(helpers.ErrorF(err.Error()))
-			return
-		} else {
-			cli.AddAnswer("token", key)
-		}
-		cli.AddAnswer("uuid", uuid.New().String())
 
 		// Proccess files
 		if err := util.Walk(source, source.Root(), func(path string, info fs.FileInfo, err error) error {

@@ -77,9 +77,57 @@ Mig compile repository template base on [Go Text Template Library](https://pkg.g
 
 **NOTE:** You can use a unique project key with `.key` variable or `__key__` placeholder. Each time you create new project mig generate new key for your project.
 
-**NOTE:** You can use a unique project access token with `.token` variable or `__token__` placeholder. Each time you create new project mig generate new access token for your project.
+### Extra Template Functions
 
-**NOTE:** You can use a unique project identifier (uuid) with `.uuid` variable or `__uuid__` placeholder. Each time you create new project mig generate new uuid for your project.
+You can use follwing helper functions in your template syntax:
+
+#### iif
+
+Return quick answer base on condition.
+
+```js
+Your gender is: <% iif .isMale "Male" "Female" %>
+```
+
+#### uuid
+
+Generate unique uuid string.
+
+```js
+const identifier = "<% uuid %>";
+```
+
+#### key32
+
+Generate 32-character unique string key.
+
+```js
+const accessKey = "<% key32 %>";
+```
+
+#### key64
+
+Generate 64-character unique string key.
+
+```js
+const accessKey = "<% key64 %>";
+```
+
+#### key96
+
+Generate 96-character unique string key.
+
+```js
+const accessKey = "<% key96 %>";
+```
+
+#### key128
+
+Generate 128-character unique string key.
+
+```js
+const accessKey = "<% key128 %>";
+```
 
 ### Extra Template Signs
 

@@ -4,7 +4,57 @@ import (
 	"bytes"
 	"strings"
 	"text/template"
+
+	"github.com/gomig/crypto"
+	"github.com/google/uuid"
 )
+
+var pipes = make(template.FuncMap, 0)
+
+func init() {
+	pipes["iif"] = func(cond bool, yes, no any) any {
+		if cond {
+			return yes
+		}
+		return no
+	}
+
+	pipes["uuid"] = func() string {
+		return uuid.NewString()
+	}
+
+	pipes["key32"] = func() string {
+		if key, err := crypto.NewCryptography(uuid.New().String()).Hash(uuid.New().String(), crypto.MD5); err != nil {
+			panic(err)
+		} else {
+			return key
+		}
+	}
+
+	pipes["key64"] = func() string {
+		if key, err := crypto.NewCryptography(uuid.New().String()).Hash(uuid.New().String(), crypto.SHA3256); err != nil {
+			panic(err)
+		} else {
+			return key
+		}
+	}
+
+	pipes["key96"] = func() string {
+		if key, err := crypto.NewCryptography(uuid.New().String()).Hash(uuid.New().String(), crypto.SHA3384); err != nil {
+			panic(err)
+		} else {
+			return key
+		}
+	}
+
+	pipes["key128"] = func() string {
+		if key, err := crypto.NewCryptography(uuid.New().String()).Hash(uuid.New().String(), crypto.SHA3512); err != nil {
+			panic(err)
+		} else {
+			return key
+		}
+	}
+}
 
 // CompileTemplate compile template file
 //
@@ -15,7 +65,11 @@ import (
 func CompileTemplate(name, commentSymbol, content string, data map[string]string, replacements map[string]string) (string, error) {
 	content = ResolvePlaceholders(content, commentSymbol, replacements)
 	content = normalizeTemplate(content, commentSymbol)
-	tpl, err := template.New(name).Delims(`<%`, `%>`).Parse(content)
+	tpl, err := template.
+		New(name).
+		Delims(`<%`, `%>`).
+		Funcs(pipes).
+		Parse(content)
 	if err != nil {
 		return "", err
 	}
