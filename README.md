@@ -89,6 +89,14 @@ Return quick answer base on condition.
 Your gender is: <% iif .isMale "Male" "Female" %>
 ```
 
+#### oneOf
+
+Check if value contains
+
+```js
+OK: <% oneOf .name "John|Jack" %>
+```
+
 #### uuid
 
 Generate unique uuid string.

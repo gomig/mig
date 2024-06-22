@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
 	"text/template"
 
@@ -17,6 +18,15 @@ func init() {
 			return yes
 		}
 		return no
+	}
+
+	pipes["oneOf"] = func(v any, valids string) bool {
+		for _, valid := range strings.Split(valids, "|") {
+			if valid == fmt.Sprint(v) {
+				return true
+			}
+		}
+		return false
 	}
 
 	pipes["uuid"] = func() string {
